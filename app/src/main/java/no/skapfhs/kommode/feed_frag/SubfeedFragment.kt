@@ -1,6 +1,8 @@
 package no.skapfhs.kommode.feed_frag
 
+import android.content.Context
 import android.os.Bundle
+import android.text.Spanned
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,54 +11,74 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.model.Document
-import com.google.firebase.firestore.model.FieldPath
+import io.noties.markwon.Markwon
+import io.noties.markwon.SoftBreakAddsNewLinePlugin
+import io.noties.markwon.image.ImagesPlugin
+import no.skapfhs.kommode.MainActivity
+import no.skapfhs.kommode.MainActivityViewModel
 import no.skapfhs.kommode.R
+import org.commonmark.node.Node
 
-class ScreenSlidePageFragment(private val feed_doc: DocumentSnapshot) : Fragment() {
+class ScreenSlidePageFragment() : Fragment() {
 
     private var feedID = ""
-
-    init {
-        feedID = feed_doc.id
-        Log.d("SUBFEED",feed_doc.toString())
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.d("SUBFEED Created","TRUE")
+        val mvM = ViewModelProvider(activity as MainActivity)[MainActivityViewModel::class.java]
+        val vM: FeedFragmentViewModel by viewModels()
+        val pos = requireArguments().getInt("pos");
+        val feedDoc = mvM.fetchedData.value!!.elementAt(pos)
 
         val root = inflater.inflate(R.layout.fragment_subfeed, container, false)
-        val testText = root.findViewById<RecyclerView>(R.id.feed_content)
+        val feedRecyclerView = root.findViewById<RecyclerView>(R.id.feed_content)
 
-        val feedContent = arrayListOf<feedContentViewModel>()
+        // POSSIBLE RACE CRASH, CHECK OUT. IF mvM.fetchedData observed before vM.feed
+        vM.pullFeed(feedDoc)
 
-        feed_doc.reference.collection("items").get().addOnSuccessListener {
-
-            for (item in it.documents) {
-                Log.d("FIREDEBUGe",item.data.toString())
+        // TODO: Swapping the whole adapter can't be the most efficient way...
+        vM.feedData.observe(viewLifecycleOwner) {
+            var feedContent = arrayListOf<FeedContentViewHolder>()
+            for (item in it) {
+                Log.d("FIREDEBUGe", item.data!!["content"] as String)
                 // TODO: add checks for content?
-                feedContent.add(feedContentViewModel(item.data!!["content"] as String))
+                feedContent.add(FeedContentViewHolder(item.data!!["content"] as String))
             }
+            Log.d("FIRERER", feedContent.toString())
 
-            testText.adapter = FeedContentAdapter(feedContent)
-
+            //if (feedRecyclerView.adapter == null) {
+                feedRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                feedRecyclerView.adapter = FeedContentAdapter(feedContent, requireContext())
+/*            } else {
+                Log.d("UPDATEDDDD", "TEST")
+                feedRecyclerView.adapter.
+                feedRecyclerView.adapter!!.notifyDataSetChanged()
+            }*/
         }
 
-        val viewModel: FeedFragmentViewModel by viewModels()
-        viewModel.interperetFeedData(feed_doc, requireContext())
+        mvM.fetchedData.observe(viewLifecycleOwner) { vM.pullFeed(feedDoc) }
 
         return root
     }
 }
 
-data class feedContentViewModel(val content: String)
+data class FeedContentViewHolder(val content: String)
 
-class FeedContentAdapter(private val feedContentList: List<feedContentViewModel>): RecyclerView.Adapter<FeedContentAdapter.ViewHolder>() {
+class FeedContentAdapter(private val feedContentList: List<FeedContentViewHolder>, private val context: Context): RecyclerView.Adapter<FeedContentAdapter.ViewHolder>() {
+    // alternativ i fremtiden ? https://medium.com/android-news/smart-way-to-update-recyclerview-using-diffutil-345941a160e0
+    // Holds the views for adding it to image and text
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val textView: TextView = itemView.findViewById(R.id.textView)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         // inflates the card_view_design view
         // that is used to hold list item
@@ -71,19 +93,29 @@ class FeedContentAdapter(private val feedContentList: List<feedContentViewModel>
 
         val itemsViewModel = feedContentList[position]
 
+        // obtain an instance of Markwon
+        val markwon: Markwon = Markwon.builder(context)
+            .usePlugin(SoftBreakAddsNewLinePlugin.create())
+            .usePlugin(ImagesPlugin.create())
+            .build();
+
+// parse markdown to commonmark-java Node
+        val node: Node = markwon.parse(itemsViewModel.content.replace("  ", "\n"));
+
+        Log.d("OUTP",itemsViewModel.content);
+
+// create styled text from parsed Node
+        val markdown: Spanned = markwon.render(node);
+
+// use it on a TextView
+        markwon.setParsedMarkdown(holder.textView, markdown);
+
         // sets the text to the textview from our itemHolder class
-        holder.textView.text = itemsViewModel.content
 
     }
 
     // return the number of the items in the list
     override fun getItemCount(): Int {
         return feedContentList.size
-    }
-
-    // Holds the views for adding it to image and text
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageView: ImageView = itemView.findViewById(R.id.imageview)
-        val textView: TextView = itemView.findViewById(R.id.textView)
     }
 }

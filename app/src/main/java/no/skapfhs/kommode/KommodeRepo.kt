@@ -20,4 +20,9 @@ class KommodeRepo {
         return docRef.get()
     }
 
+    fun getPath(path: String): Task<QuerySnapshot> {
+        val docRef = db.collection(path)
+        return docRef.get()
+    }
+
 }

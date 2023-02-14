@@ -1,29 +1,28 @@
 package no.skapfhs.kommode.feed_frag
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
-
-data class Feed (
-    val name: String? = null
-)
-
-data class FetchedFeedData (
-    val data: MutableList<Feed> = MutableList(1) {
-        Feed()
-    }
-)
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.model.Document
+import no.skapfhs.kommode.KommodeRepo
 
 class FeedFragmentViewModel: ViewModel() {
-    private val _uiState = MutableLiveData(FetchedFeedData())
-    val uiState: FetchedFeedData? = _uiState.value
+    var feedData = MutableLiveData<List<DocumentSnapshot>>()
 
-    // Handle business logic
-    fun interperetFeedData(data: DocumentSnapshot, context: Context): List<View> {
-        val items = data["items"]
-        return listOf<View>(TextView(context))
+    // Lage funksjon for henting av forskjellige feed IDer og lagring i LiveData, som oppdateres hvis feed_data i Main vM oppdateres
+
+    fun itemsPath(feedId: String) = "/feeds/${feedId}/items/"
+
+    fun pullFeed(feedDoc: DocumentSnapshot): Task<QuerySnapshot> {
+        return feedDoc.reference.collection("items").get()
+            .addOnSuccessListener {
+                feedData.value = it.documents
+            }
     }
 
 }

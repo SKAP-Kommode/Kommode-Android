@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import no.skapfhs.kommode.MainActivity
 import no.skapfhs.kommode.MainActivityViewModel
 import no.skapfhs.kommode.databinding.FragmentFeedBinding
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -36,14 +37,26 @@ class FeedFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         _binding = FragmentFeedBinding.inflate(inflater, container, false)
 
-        val viewModel: FeedFragmentViewModel by viewModels()
-        val viewModelMain: MainActivityViewModel by viewModels()
+        val mvM = ViewModelProvider(activity as MainActivity)[MainActivityViewModel::class.java]
+        Log.d("TEST","RAn")
 
-        val adapter = context?.let { activity?.let { it1 -> FeedTabsAdapter(it1) } }
+        val adapter = FeedTabsAdapter(requireActivity())
+        Log.d("Creating VIEW","TE")
         binding.feedViewPager.adapter = adapter
+
+        mvM.fetchedData.observe(viewLifecycleOwner) {
+            Log.d("FETCHED DATA",it.toString())
+            binding.feedLoadingIndicator.visibility = View.INVISIBLE
+            binding.feedMainHolder.visibility = View.VISIBLE
+            //binding.feedViewPager.currentItem = 0
+
+            TabLayoutMediator(binding.feedTabs, binding.feedViewPager) { tab, position ->
+                tab.text = it.elementAt(position)["fullname"].toString()
+                //tab.icon = context?.let { context -> getDrawable(context,android.R.drawable.alert_dark_frame) }
+            }.attach()
+        }
 
         return binding.root
 
@@ -53,17 +66,14 @@ class FeedFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val mvM = ViewModelProvider(activity as MainActivity)[MainActivityViewModel::class.java]
-        Log.d("TEST","RAn")
-        mvM.fetchedData.observe(viewLifecycleOwner) {
-            Log.d("TEST",it.toString())
-            binding.feedLoadingIndicator.visibility = View.INVISIBLE
-            binding.feedMainHolder.visibility = View.VISIBLE
 
-            TabLayoutMediator(binding.feedTabs, binding.feedViewPager) { tab, position ->
-                tab.text = it.elementAt(position)["fullname"].toString()
-                tab.icon = context?.let { context -> getDrawable(context,android.R.drawable.alert_dark_frame) }
-            }.attach()
+        // refresh on pull-down
+        binding.feedMainHolder.setOnRefreshListener {
+            mvM.getFeeds().addOnSuccessListener {
+                binding.feedMainHolder.isRefreshing = false
+            }
         }
+
         //handle change in tabs, and swap main_feed content
 
     }
