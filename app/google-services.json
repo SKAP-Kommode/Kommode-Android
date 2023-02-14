@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1060364278534",
+    "project_id": "kommode-7c0a0",
+    "storage_bucket": "kommode-7c0a0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1060364278534:android:a3de3572ef1cf8f4595c87",
+        "android_client_info": {
+          "package_name": "no.skapfhs.kommode"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1060364278534-0gl9913fhp3ohfkbeentqasg6vtq6j20.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxxAV015gI8a94AcGdeempni6HvvwGYKQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1060364278534-0gl9913fhp3ohfkbeentqasg6vtq6j20.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/fragment_feed">
+    <fragment
+        android:id="@+id/fragment_profile"
+        android:name="no.skapfhs.kommode.profile_frag.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile"/>
+    <fragment
+        android:id="@+id/fragment_calendar"
+        android:name="no.skapfhs.kommode.calender_frag.CalendarFragment"
+        android:label="fragment_calendar"
+        tools:layout="@layout/fragment_calendar" />
+    <fragment
+        android:id="@+id/fragment_feed"
+        android:name="no.skapfhs.kommode.feed_frag.FeedFragment"
+        android:label="fragment_feed"
+        tools:layout="@layout/fragment_feed" />
+</navigation>
