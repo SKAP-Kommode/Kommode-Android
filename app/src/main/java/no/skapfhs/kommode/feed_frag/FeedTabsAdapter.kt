@@ -28,6 +28,5 @@ internal class FeedTabsAdapter(private val fa: FragmentActivity) : FragmentState
         return frag
     }
 
-
 }
 // https://developer.android.com/guide/navigation/navigation-swipe-view-2

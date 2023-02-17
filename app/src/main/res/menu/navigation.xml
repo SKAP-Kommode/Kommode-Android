@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="fragment_home"
+        android:title="@string/home"
+        android:icon="@drawable/outline_dynamic_feed_24" />
+    <item
         android:id="@id/fragment_feed"
         android:title="@string/news"
         android:icon="@drawable/outline_feed_24"/>

@@ -9,6 +9,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -42,6 +43,11 @@ class MainActivity : AppCompatActivity() {
         setupBottomNavMenu(navController)
 
         val viewModel: MainActivityViewModel by viewModels()
+
+        binding.contentMainContainer.attendanceBtn.setOnClickListener {
+            Toast.makeText(this, "Attendance launcher", Toast.LENGTH_LONG).show()
+        }
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.getFeeds()
