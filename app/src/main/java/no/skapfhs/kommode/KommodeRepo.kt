@@ -26,7 +26,7 @@ class KommodeRepo {
     }
 
     fun getLaunderRooms(): Task<QuerySnapshot> {
-        val docRef = db.collection("/common/launderrooms/")
+        val docRef = db.collection("/static/launderrooms/")
         return docRef.get()
     }
 

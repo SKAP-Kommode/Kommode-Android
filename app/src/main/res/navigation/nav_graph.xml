@@ -3,7 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/fragment_feed">
+    app:startDestination="@id/fragment_home">
+    <fragment
+        android:id="@+id/fragment_home"
+        android:name="no.skapfhs.kommode.home_frag.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home"/>
     <fragment
         android:id="@+id/fragment_profile"
         android:name="no.skapfhs.kommode.profile_frag.ProfileFragment"
