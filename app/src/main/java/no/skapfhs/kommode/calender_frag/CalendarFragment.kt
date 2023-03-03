@@ -48,7 +48,7 @@ class CalendarFragment : Fragment() {
             init {
                 view.setOnClickListener {
                     // Use the CalendarDay associated with this container.
-                    view.setBackgroundColor(resources.getColor(R.color.white, null))
+                    view.setBackgroundColor(resources.getColor(R.color.md_theme_dark_secondaryContainer, null))
                 }
             }
         }

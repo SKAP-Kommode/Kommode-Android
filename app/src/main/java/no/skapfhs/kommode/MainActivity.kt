@@ -1,25 +1,24 @@
 package no.skapfhs.kommode
 
+import android.app.ActivityOptions
+import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.WindowCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
+import android.view.Window
 import androidx.activity.viewModels
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import kotlinx.coroutines.launch
 import no.skapfhs.kommode.databinding.ActivityMainBinding
 
@@ -29,7 +28,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        // Enable Activity Transitions. Optionally enable Activity transitions in your
+        // theme with <item name=”android:windowActivityTransitions”>true</item>.
+        window.requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
+
+        // Attach a callback used to capture the shared elements from this Activity to be used
+        // by the container transform transition
+        setExitSharedElementCallback(MaterialContainerTransformSharedElementCallback())
+
+        // Keep system bars (status bar, navigation bar) persistent throughout the transition.
+        window.sharedElementsUseOverlay = false
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -44,8 +52,16 @@ class MainActivity : AppCompatActivity() {
 
         val viewModel: MainActivityViewModel by viewModels()
 
-        binding.contentMainContainer.attendanceBtn.setOnClickListener {
-            Toast.makeText(this, "Attendance launcher", Toast.LENGTH_LONG).show()
+        binding.contentMainContainer.attendanceBtn.setOnClickListener {// launch intent for attendance nfc scan
+            val intent = Intent(this, AttendanceActivity::class.java)
+
+//            val options = ActivityOptions.makeSceneTransitionAnimation(
+//                this,
+//                binding.contentMainContainer.attendanceBtn,
+//                "shared_element_container" // The transition name to be matched in Activity B.
+//            )
+            startActivity(intent) //,options.toBundle())
+
         }
 
         lifecycleScope.launch {

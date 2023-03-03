@@ -27,6 +27,7 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/outline_front_hand_32"
+        android:transitionName="attendance"
         android:contentDescription="Attendance" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
